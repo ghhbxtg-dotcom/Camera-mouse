@@ -7,7 +7,31 @@ import time
 pyautogui.FAILSAFE = False
 pyautogui.PAUSE = 0
 
-cap = cv2.VideoCapture(0)
+cap = None
+
+for i in range(5):
+
+    camera = cv2.VideoCapture(i, cv2.CAP_DSHOW)
+
+    if camera.isOpened():
+
+        ret, test_frame = camera.read()
+
+        if ret and test_frame is not None:
+
+            cap = camera
+
+            print(f"[INFO] Камера найдена: {i}")
+
+            break
+
+        camera.release()
+
+if cap is None:
+
+    print("[ERROR] Камера не найдена")
+
+    exit()
 
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
@@ -32,8 +56,13 @@ last_click = 0
 pTime = 0
 
 while True:
-
     ret, frame = cap.read()
+    if not ret or frame is None:
+
+        print("[WARNING] Кадр не получен")
+
+        continue
+
     frame = cv2.flip(frame, 1)
 
     h, w, _ = frame.shape
